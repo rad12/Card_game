@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,
+          initial-scale=1.0, maximum-scale=1.0,
+          user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f0f23">
+    <title>لعبة الأوراق</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== شاشة البداية ========== -->
+<div id="screen-start" class="screen active">
+    <div class="start-container">
+        <div class="game-logo">🃏</div>
+        <h1 class="game-title">لعبة الأوراق</h1>
+        <button class="btn-main"
+                onclick="showScreen('screen-names')">
+            👥 لعب على نفس الهاتف
+        </button>
+        <button class="btn-main btn-online"
+                onclick="showScreen('screen-room')">
+            📱 لعب أونلاين
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة الأسماء ========== -->
+<div id="screen-names" class="screen">
+    <div class="setup-header">
+        <h2>👥 أدخل أسماء اللاعبين</h2>
+        <p>قبل بدء اللعبة</p>
+    </div>
+    <div class="names-container">
+        <div class="name-card">
+            <div class="name-icon">🎮</div>
+            <label>اسم اللاعب الأول:</label>
+            <input type="text"
+                   id="name-p1"
+                   placeholder="أدخل اسمك"
+                   maxlength="15"
+                   class="name-input">
+        </div>
+        <div class="name-card">
+            <div class="name-icon">🎯</div>
+            <label>اسم اللاعب الثاني:</label>
+            <input type="text"
+                   id="name-p2"
+                   placeholder="أدخل اسمك"
+                   maxlength="15"
+                   class="name-input">
+        </div>
+        <button class="btn-main"
+                onclick="confirmNames()">
+            ابدأ اللعبة ✓
+        </button>
+        <button class="btn-back"
+                onclick="showScreen('screen-start')">
+            ← رجوع
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة تسليم الهاتف ========== -->
+<div id="screen-handover" class="screen">
+    <div class="handover-container">
+        <div style="font-size:4em">📱</div>
+        <h2>سلّم الهاتف لـ</h2>
+        <p id="handover-name"
+           style="color:#FFD700;font-size:1.8em;
+                  font-weight:bold;text-align:center">
+        </p>
+        <p id="handover-msg"
+           style="color:#aaa;font-size:0.9em;
+                  text-align:center;
+                  margin:10px 20px">
+        </p>
+        <button class="btn-main"
+                id="btn-handover-ready"
+                onclick="handoverReady()">
+            ✓ أنا جاهز
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة التغطية ========== -->
+<div id="screen-cover" class="screen">
+    <div class="cover-container">
+        <div style="font-size:4em">🙈</div>
+        <h2 id="cover-title">انتهى دورك!</h2>
+        <p id="cover-msg"
+           style="color:#aaa;text-align:center;
+                  margin:10px 20px">
+        </p>
+        <button class="btn-main"
+                id="btn-pass-phone"
+                onclick="passPhoneToNext()">
+            📱 سلّم الهاتف
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة اختيار الاتصال ========== -->
+<div id="screen-room" class="screen">
+    <div class="room-container">
+        <h2 class="room-title">🔗 اختر طريقة الاتصال</h2>
+        <div class="method-card"
+             onclick="selectMethod('firebase')">
+            <div class="method-icon">☁️</div>
+            <div class="method-info">
+                <h3>Firebase</h3>
+                <p>عبر الإنترنت - من أي مكان</p>
+                <div class="method-tags">
+                    <span class="tag tag-green">الأفضل</span>
+                    <span class="tag tag-blue">مجاني</span>
+                </div>
+            </div>
+            <div class="method-arrow">←</div>
+        </div>
+        <div class="method-card"
+             onclick="selectMethod('wifi')">
+            <div class="method-icon">📶</div>
+            <div class="method-info">
+                <h3>WiFi محلي</h3>
+                <p>نفس الشبكة - بدون إنترنت</p>
+                <div class="method-tags">
+                    <span class="tag tag-yellow">سريع</span>
+                    <span class="tag tag-blue">بدون نت</span>
+                </div>
+            </div>
+            <div class="method-arrow">←</div>
+        </div>
+        <div class="method-card"
+             onclick="selectMethod('qr')">
+            <div class="method-icon">📷</div>
+            <div class="method-info">
+                <h3>QR Code</h3>
+                <p>امسح الكود للانضمام</p>
+                <div class="method-tags">
+                    <span class="tag tag-purple">سهل</span>
+                    <span class="tag tag-blue">مجاني</span>
+                </div>
+            </div>
+            <div class="method-arrow">←</div>
+        </div>
+        <button class="btn-back"
+                onclick="showScreen('screen-start')">
+            ← رجوع
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة Firebase ========== -->
+<div id="screen-firebase" class="screen">
+    <div class="setup-header">
+        <h2>☁️ Firebase</h2>
+        <p>العب من أي مكان</p>
+    </div>
+    <div class="start-container" style="gap:15px">
+        <button class="btn-main"
+                onclick="createRoomFirebase()">
+            ➕ إنشاء غرفة جديدة
+        </button>
+        <div class="divider">أو</div>
+        <div class="join-area">
+            <p style="color:#aaa">أدخل كود الغرفة:</p>
+            <input type="text"
+                   id="firebase-code-input"
+                   placeholder="ABC123"
+                   maxlength="6"
+                   class="room-input">
+            <button class="btn-join"
+                    onclick="joinRoomFirebase()">
+                🚪 انضم
+            </button>
+        </div>
+        <button class="btn-back"
+                onclick="showScreen('screen-room')">
+            ← رجوع
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة WiFi ========== -->
+<div id="screen-wifi" class="screen">
+    <div class="setup-header">
+        <h2>📶 WiFi محلي</h2>
+        <p>تأكد أن الهاتفين على نفس الشبكة</p>
+    </div>
+    <div class="start-container" style="gap:15px">
+        <button class="btn-main"
+                onclick="createRoomWifi()">
+            ➕ إنشاء غرفة
+        </button>
+        <div class="divider">أو</div>
+        <div class="join-area">
+            <p style="color:#aaa">أدخل كود الغرفة:</p>
+            <input type="text"
+                   id="wifi-code-input"
+                   placeholder="ABC123"
+                   maxlength="6"
+                   class="room-input">
+            <button class="btn-join"
+                    onclick="joinRoomWifi()">
+                🔌 اتصال
+            </button>
+        </div>
+        <div id="wifi-my-ip" class="ip-display">
+            جاري البحث عن IP...
+        </div>
+        <button class="btn-back"
+                onclick="showScreen('screen-room')">
+            ← رجوع
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة QR ========== -->
+<div id="screen-qr" class="screen">
+    <div class="setup-header">
+        <h2>📷 QR Code</h2>
+        <p>امسح الكود للانضمام</p>
+    </div>
+    <div class="start-container" style="gap:15px">
+        <button class="btn-main"
+                onclick="createRoomQR()">
+            ➕ إنشاء غرفة وعرض QR
+        </button>
+        <div class="divider">أو</div>
+        <button class="btn-join"
+                onclick="scanQR()">
+            📷 امسح QR للانضمام
+        </button>
+        <button class="btn-back"
+                onclick="showScreen('screen-room')">
+            ← رجوع
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة الانتظار ========== -->
+<div id="screen-waiting" class="screen">
+    <div class="start-container">
+        <div id="waiting-method-icon"
+             style="font-size:3em">☁️</div>
+        <div id="waiting-code-area"
+             class="room-code-display">
+            <p style="color:#aaa;font-size:0.9em">
+                كود الغرفة:
+            </p>
+            <h1 id="display-room-code"
+                style="color:#FFD700;font-size:2.5em;
+                       letter-spacing:8px;margin:5px 0">
+                ------
+            </h1>
+        </div>
+        <div id="qr-container"
+             style="display:none;text-align:center">
+            <div id="qr-code-display"
+                 style="background:white;padding:15px;
+                        border-radius:10px;
+                        display:inline-block">
+            </div>
+            <p style="color:#aaa;font-size:0.85em;
+                      margin-top:8px">
+                اطلب من المنافس مسح هذا الكود
+            </p>
+        </div>
+        <div id="wifi-info-display" style="display:none">
+            <div class="ip-display-large">
+                <p style="color:#aaa">IP الخاص بك:</p>
+                <p id="host-ip-display"
+                   style="color:#FFD700;font-size:1.5em;
+                          font-family:monospace">
+                </p>
+            </div>
+        </div>
+        <div class="waiting-animation">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <p id="waiting-msg"
+           style="color:#aaa;text-align:center">
+            في انتظار اللاعب الثاني...
+        </p>
+        <button class="btn-back"
+                onclick="cancelWaiting()">
+            ✕ إلغاء
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة الإعداد ========== -->
+<div id="screen-setup" class="screen">
+    <div class="setup-header">
+        <h2 id="setup-title">اختر 8 أوراق</h2>
+        <p id="setup-subtitle">اختر 8 أوراق</p>
+    </div>
+    <div class="selected-area">
+        <h3>أوراقك المختارة
+            (<span id="selected-count">0</span>/8)
+        </h3>
+        <div id="selected-cards" class="cards-row"></div>
+    </div>
+    <div class="deck-area">
+        <h3>الأوراق المتاحة</h3>
+        <div id="deck-cards"></div>
+    </div>
+    <button class="btn-main"
+            id="btn-confirm-setup"
+            onclick="confirmSetup()"
+            disabled>
+        تأكيد الاختيار
+    </button>
+</div>
+
+<!-- ========== شاشة الترتيب ========== -->
+<div id="screen-arrange" class="screen">
+    <div class="setup-header">
+        <h2 id="arrange-title">رتّب أوراقك</h2>
+        <p id="arrange-subtitle">
+            اضغط ورقة ثم اضغط موضعها
+        </p>
+    </div>
+    <div class="arrange-instructions">
+        💡 اضغط ورقة لتحديدها ثم اضغط موضعها
+    </div>
+    <div class="arrange-slots-label">
+        ترتيبك النهائي:
+    </div>
+    <div id="arrange-slots" class="arrange-slots"></div>
+    <div class="arrange-cards-label">أوراقك:</div>
+    <div id="arrange-cards"
+         class="arrange-cards-area"></div>
+    <div id="arrange-msg" class="arrange-msg"></div>
+    <div class="arrange-btns">
+        <button class="btn-reset"
+                onclick="resetArrange()">
+            🔄 إعادة الترتيب
+        </button>
+        <button class="btn-main"
+                id="btn-confirm-arrange"
+                onclick="confirmArrange()"
+                disabled>
+            تأكيد الترتيب ✓
+        </button>
+    </div>
+</div>
+
+<!-- ========== شاشة اللعبة - اللاعب 1 ========== -->
+<div id="screen-game" class="screen">
+    <div class="player-area opponent">
+        <div class="player-info">
+            <span class="warning-light"
+                  id="warning2"></span>
+            <span class="player-name"
+                  id="name-display-2">اللاعب 2</span>
+            <span class="tokens opponent-tokens"
+                  id="tokens2">🪙 ••••</span>
+        </div>
+        <div id="cards2" class="cards-row"></div>
+    </div>
+    <div class="middle-area">
+        <div class="timer-box">
+            <div id="timer" class="timer">30</div>
+            <div class="timer-label">ثانية</div>
+        </div>
+        <div class="round-info">
+            <span id="round-num">الجولة: 1</span>
+        </div>
+        <div id="status-msg" class="status-msg">
+            قدّم رموزك
+        </div>
+    </div>
+    <div class="player-area current">
+        <div id="cards1" class="cards-row"></div>
+        <div class="offer-area">
+            <div class="offer-info">
+                <span>الرموز: </span>
+                <span id="offer-value">0</span>
+            </div>
+            <input type="range"
+                   id="token-slider"
+                   min="0" max="10" value="0"
+                   oninput="updateSlider(this.value)">
+            <button class="btn-offer"
+                    id="btn-offer"
+                    onclick="submitOffer()">
+                تقديم الرموز
+            </button>
+        </div>
+        <div class="player-info">
+            <span class="warning-light"
+                  id="warning1"></span>
+            <span class="player-name"
+                  id="name-display-1">اللاعب 1</span>
+            <span class="tokens current-tokens"
+                  id="tokens1">🪙 10</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== شاشة اللعبة - اللاعب 2 ========== -->
+<div id="screen-game-p2" class="screen">
+    <div class="player-area opponent">
+        <div class="player-info">
+            <span class="warning-light"
+                  id="warning1-p2"></span>
+            <span class="player-name"
+                  id="name-display-1-p2">اللاعب 1</span>
+            <span class="tokens opponent-tokens">
+                🪙 ••••
+            </span>
+        </div>
+        <div id="cards1-hidden" class="cards-row"></div>
+    </div>
+    <div class="middle-area">
+        <div class="timer-box">
+            <div id="timer-p2" class="timer">30</div>
+            <div class="timer-label">ثانية</div>
+        </div>
+        <div class="round-info">
+            <span id="round-num-p2">الجولة: 1</span>
+        </div>
+        <div id="status-msg-p2" class="status-msg">
+            قدّم رموزك
+        </div>
+    </div>
+    <div class="player-area current">
+        <div id="cards2-visible" class="cards-row"></div>
+        <div class="offer-area">
+            <div class="offer-info">
+                <span>الرموز: </span>
+                <span id="offer-value-p2">0</span>
+            </div>
+            <input type="range"
+                   id="token-slider-p2"
+                   min="0" max="10" value="0"
+                   oninput="updateSliderP2(this.value)">
+            <button class="btn-offer"
+                    id="btn-offer-p2"
+                    onclick="submitOfferP2()">
+                تقديم الرموز
+            </button>
+        </div>
+        <div class="player-info">
+            <span class="warning-light"
+                  id="warning2-p2"></span>
+            <span class="player-name"
+                  id="name-display-2-p2">اللاعب 2</span>
+            <span class="tokens current-tokens"
+                  id="tokens2-p2">🪙 10</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== النوافذ المنبثقة ========== -->
+
+<div id="modal-winner" class="modal">
+    <div class="modal-content">
+        <h2 id="modal-winner-title">🏆 فزت بالجولة!</h2>
+        <p>ماذا تريد أن تفعل؟</p>
+        <button class="btn-modal"
+                onclick="chooseQuestion()">
+            ❓ أسأل سؤالاً
+        </button>
+        <button class="btn-modal btn-truth"
+                onclick="chooseTruth()">
+            🎯 أخمن الترتيب
+        </button>
+    </div>
+</div>
+
+<div id="modal-questions" class="modal">
+    <div class="modal-content">
+        <h2>اختر سؤالاً</h2>
+
+        <!-- SUM - المجموع -->
+        <div class="question-category">
+            <div class="category-title">
+                <span class="category-icon">➕</span>
+                <span>SUM - المجموع</span>
+            </div>
+            <div class="category-questions">
+                <div class="question-item"
+                     onclick="selectQuestionById(1)">
+                    إذا اخترت 3 مواقع للبطاقات،
+                    فما مجموع قيم جميع البطاقات
+                    الموجودة في تلك المواقع؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(2)">
+                    إذا اخترت شكلاً واحداً للبطاقات،
+                    فما مجموع قيم جميع البطاقات
+                    التي تحمل ذلك الشكل؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(3)">
+                    ما مجموع قيم جميع البطاقات
+                    الأبجدية (الحروف)؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(4)">
+                    ما مجموع قيم جميع البطاقات
+                    الرقمية؟
+                </div>
+            </div>
+        </div>
+
+        <!-- COUNT - العدد -->
+        <div class="question-category">
+            <div class="category-title">
+                <span class="category-icon">🔢</span>
+                <span>COUNT - العدد</span>
+            </div>
+            <div class="category-questions">
+                <div class="question-item"
+                     onclick="selectQuestionById(5)">
+                    كم عدد البطاقات الأبجدية
+                    (الحروف) الموجودة؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(6)">
+                    كم عدد البطاقات الرقمية
+                    الموجودة؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(7)">
+                    إذا اخترت رقماً أو حرفاً واحداً،
+                    فكم عدد البطاقات التي تحمل
+                    ذلك الرقم أو الحرف؟
+                </div>
+            </div>
+        </div>
+
+        <!-- POSITION - الموقع -->
+        <div class="question-category">
+            <div class="category-title">
+                <span class="category-icon">📍</span>
+                <span>POSITION - الموقع</span>
+            </div>
+            <div class="category-questions">
+                <div class="question-item"
+                     onclick="selectQuestionById(8)">
+                    إذا اخترت شكلاً واحداً للبطاقات،
+                    في أي مواقع تقع بطاقات
+                    ذلك الشكل؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(9)">
+                    إذا اخترت رقماً أو حرفاً واحداً،
+                    في أي موقع تقع البطاقة
+                    التي تحمله؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(10)">
+                    في أي مواقع توجد البطاقات
+                    الأبجدية والرقمية المتسلسلة
+                    من نفس الشكل؟
+                </div>
+                <div class="question-item"
+                     onclick="selectQuestionById(11)">
+                    في أي موقع توجد البطاقة ذات
+                    القيمة الأكبر أو الأصغر؟
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-cancel"
+                onclick="closeModal('modal-questions')">
+            إلغاء
+        </button>
+    </div>
+</div>
+</div>
+
+<div id="modal-answer" class="modal">
+    <div class="modal-content">
+        <h2>سؤال للمنافس</h2>
+        <p id="question-text"
+           class="question-text"></p>
+        <p class="answer-note">
+            ⚠️ يجب الإجابة بصدق!
+        </p>
+        <div class="answer-btns">
+            <button class="btn-yes"
+                    onclick="answerQuestion(true)">
+                ✅ نعم
+            </button>
+            <button class="btn-no"
+                    onclick="answerQuestion(false)">
+                ❌ لا
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-guess" class="modal">
+    <div class="modal-content">
+        <h2>🎯 خمّن الترتيب</h2>
+        <p>أدخل قيم الأوراق من اليسار لليمين</p>
+        <p class="guess-hint">
+            مثال: A 3 5 7 9 J Q K
+        </p>
+        <input type="text"
+               id="guess-input"
+               placeholder="A 2 3 ..."
+               class="guess-input">
+        <button class="btn-modal"
+                onclick="submitGuess()">
+            تأكيد التخمين
+        </button>
+        <button class="btn-cancel"
+                onclick="closeModal('modal-guess')">
+            إلغاء
+        </button>
+    </div>
+</div>
+
+<div id="modal-gameover" class="modal">
+    <div class="modal-content">
+        <div id="gameover-content"></div>
+        <button class="btn-main"
+                onclick="location.reload()">
+            🔄 لعبة جديدة
+        </button>
+    </div>
+</div>
+
+<div id="modal-tie" class="modal">
+    <div class="modal-content">
+        <h2>🤝 تعادل!</h2>
+        <p>قدّم الاثنان نفس العدد</p>
+        <p id="tie-info"></p>
+        <button class="btn-modal"
+                onclick="closeModal('modal-tie');
+                         resetOffering()">
+            متابعة
+        </button>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<!-- QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<!-- Firebase Config -->
+<script>
+var firebaseConfig = {
+    apiKey: "ضع-مفتاحك-هنا",
+    authDomain: "مشروعك.firebaseapp.com",
+    databaseURL: "https://مشروعك-default-rtdb.firebaseio.com",
+    projectId: "مشروعك",
+    storageBucket: "مشروعك.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef"
+};
+try {
+    firebase.initializeApp(firebaseConfig);
+} catch(e) {
+    console.log('Firebase not configured');
+}
+</script>
+
+<script src="cards.js"></script>
+<script src="questions.js"></script>
+<script src="game.js"></script>
+<script src="connection.js"></script>
+</body>
+</html>
